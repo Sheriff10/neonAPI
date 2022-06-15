@@ -421,7 +421,7 @@ app.post("/mine", async (req, res) => {
 });
 
 // con.end();
-app.listen(port, () => {
+app.listen(process.env.PORT || port, () => {
   console.log("Mayowa Api Running...");
 });
 
