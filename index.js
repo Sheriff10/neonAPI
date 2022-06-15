@@ -420,11 +420,11 @@ app.post("/mine", async (req, res) => {
   });
 });
 
-// con.end();
+con.end();
 app.listen(process.env.PORT || port, () => {
   console.log("Mayowa Api Running...");
 });
-
+//
 // Signup Users
 // app.post("/signup", async (req, res) => {
 //   const { username, email, password, upline } = req.body;
