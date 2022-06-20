@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const db = mongoose.createConnection();
 
 db.openUri(
-  "mongodb+srv://sephora:frZEKREp1dBnXfY0@cluster0.ggjkuqt.mongodb.net/?retryWrites=true&w=majority/sephora",
+  "mongodb+srv://sephora:frZEKREp1dBnXfY0@cluster0.ggjkuqt.mongodb.net/?retryWrites=true&w=majority",
   { useUnifiedTopology: true }
 );
 mongoose.connection.on("error", (err) => {
