@@ -247,6 +247,6 @@ app.get("/penwithdrawal", (req, res) => {
     });
 });
 
-app.listen(port, () => {
+app.listen(process.env.PORT || port, () => {
   console.log("Running on port 4000");
 });
