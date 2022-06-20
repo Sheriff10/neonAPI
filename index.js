@@ -287,7 +287,7 @@ app.post("/condeposit", async (req, res) => {
   res.send("done");
 });
 
-// CONFIRM PAYOUT
+// CONFIRM PAYOUTs
 app.post("/conpayout", async (req, res) => {
   const { amount, username, id, status } = req.body;
 
