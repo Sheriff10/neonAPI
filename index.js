@@ -15,7 +15,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = mongoose.createConnection();
 
-db.openUri("mongodb+srv://sephora:frZEKREp1dBnXfY0@cluster0.ggjkuqt.mongodb.net/?retryWrites=true&w=majority/sephora", { useUnifiedTopology: true });
+db.openUri(
+  "mongodb+srv://sephora:frZEKREp1dBnXfY0@cluster0.ggjkuqt.mongodb.net/?retryWrites=true&w=majority/sephora",
+  { useUnifiedTopology: true }
+);
 mongoose.connection.on("error", (err) => {
   logError(err);
 });
@@ -44,7 +47,7 @@ app.post("/signup", async (req, res) => {
     recharge: 0,
     deposit: 0,
     ref: 0,
-    withrawal: 0,
+    withdrawal: 0,
     address,
   };
 
@@ -245,6 +248,62 @@ app.get("/penwithdrawal", (req, res) => {
       if (err) throw err;
       res.send(result);
     });
+});
+
+app.post("/condeposit", async (req, res) => {
+  const { amount, username, id, status } = req.body;
+
+  if (status == "cancelled") {
+    db.collection("deposits").updateOne({ id }, { $set: { status } });
+  } else {
+    const getBal = await db.collection("users").find({ username }).toArray();
+    const cBal = parseInt(getBal[0].recharge);
+    const upline = getBal[0].upline;
+
+    const commission = (5 / 100) * parseInt(amount);
+
+    db.collection("users").updateOne(
+      { username },
+      { $set: { recharge: cBal + parseInt(amount) } }
+    );
+    db.collection("deposits").updateOne({ id }, { $set: { status } });
+
+    if (upline !== null && upline !== "undefined") {
+      const get_upline_bal = await db
+        .collection("users")
+        .find({ id: upline })
+        .toArray();
+      const upline_bal = parseInt(get_upline_bal[0].balance);
+      db.collection("users").updateOne(
+        { id: upline },
+        {
+          $set: {
+            balance: upline_bal + commission,
+          },
+        }
+      );
+    }
+  }
+  res.send("done");
+});
+
+// CONFIRM PAYOUT
+app.post("/conpayout", async (req, res) => {
+  const { amount, username, id, status } = req.body;
+
+  if (status == "cancelled") {
+    db.collection("payouts").updateOne({ id }, { $set: { status } });
+  } else {
+    const getBal = await db.collection("users").find({ username }).toArray();
+    // const cBal = getBal[0].total_payout;
+
+    // db.collection("users").updateOne(
+    //   { username },
+    //   { $set: { total_payout: parseInt(cBal) + parseInt(amount) } }
+    // );
+    db.collection("payouts").updateOne({ id }, { $set: { status } });
+  }
+  res.send("done");
 });
 
 app.listen(process.env.PORT || port, () => {
