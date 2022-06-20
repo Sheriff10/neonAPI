@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = mongoose.createConnection();
 
-db.openUri("mongodb://127.0.0.1:27017/mayowa", { useUnifiedTopology: true });
+db.openUri("mongodb+srv://sephora:frZEKREp1dBnXfY0@cluster0.ggjkuqt.mongodb.net/?retryWrites=true&w=majority/sephora", { useUnifiedTopology: true });
 mongoose.connection.on("error", (err) => {
   logError(err);
 });
