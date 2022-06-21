@@ -295,12 +295,6 @@ app.post("/conpayout", async (req, res) => {
     db.collection("payouts").updateOne({ id }, { $set: { status } });
   } else {
     const getBal = await db.collection("users").find({ username }).toArray();
-    // const cBal = getBal[0].total_payout;
-
-    // db.collection("users").updateOne(
-    //   { username },
-    //   { $set: { total_payout: parseInt(cBal) + parseInt(amount) } }
-    // );
     db.collection("payouts").updateOne({ id }, { $set: { status } });
   }
   res.send("done");
