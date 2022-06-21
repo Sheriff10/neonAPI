@@ -159,7 +159,7 @@ app.post("/login", async (req, res) => {
             );
             db.collection("deposits").updateOne(
               { id: dep_id },
-              { $set: { active: "completed" } }
+              { $set: { status: "completed" } }
             );
           }
 
@@ -370,5 +370,5 @@ app.post("/conpayout", async (req, res) => {
 });
 
 app.listen(process.env.PORT || port, () => {
-  console.log("Running on port 4000");
+  console.log("Sephora");
 });
