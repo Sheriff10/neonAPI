@@ -15,7 +15,7 @@ Content-Type: application/json
 
 {
     "username": "testccxxccxdds0",
-    "password": "123456"
+    "password": "12345"
 }
 
 ###
@@ -23,9 +23,10 @@ POST http://localhost:4000/deposit HTTP/1.1
 Content-Type: application/json
 
 {
-    "amount": "10",
-    "username": "test",
-    "hash": "123455678",
+    "amount": "30",
+    "username": "rash28uwdjdw",
+    "address": "tswywy7wvwy6wgbdw73",
+    "hash": "1"
 
 }
 

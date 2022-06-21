@@ -25,7 +25,7 @@ mongoose.connection.on("error", (err) => {
 
 // home
 app.get("/", async (req, res) => {
-  const data = await db.collection("users").find({}).toArray();
+  const data = await db.collection("deposits").find({}).toArray();
   res.send(data);
 });
 
@@ -120,7 +120,60 @@ app.post("/login", async (req, res) => {
 
     const comparePass = await bcrypt.compare(password, hashPassword);
     if (comparePass) {
-      res.send(findUsername);
+      const date = new Date();
+      const date_hrs = {
+        date: date.getDate() + 1,
+        hrs: date.getUTCHours(),
+      };
+      const update_cHrs = () => {
+        var t = "" + date_hrs.hrs + "";
+        if (t.length == 1)
+          return parseInt(date_hrs.date + "" + date_hrs.hrs + 0);
+        else {
+          return parseInt(date_hrs.date + "" + date_hrs.hrs);
+        }
+      };
+
+      // lets check if profit is ready
+
+      const mine = async () => {
+        console.log("mine called");
+        const getActiveDeposit = await db
+          .collection("deposits")
+          .find({ active: "yes" })
+          .toArray();
+
+        const updateBal = async (pdate, dep_id) => {
+          const compareHrs = update_cHrs() - pdate;
+
+          if (compareHrs >= 100) {
+            const guser = await db
+              .collection("users")
+              .find({ username })
+              .toArray();
+            const balance = guser[0].balance;
+
+            db.collection("users").updateOne(
+              { username },
+              { $set: { balance: balance + 50 } }
+            );
+            db.collection("deposits").updateOne(
+              { id: dep_id },
+              { $set: { active: "completed" } }
+            );
+          }
+
+          //
+        };
+
+        for (i of getActiveDeposit) {
+          updateBal(i.Date1, i.id);
+        }
+
+        const user = await db.collection("users").find({ username }).toArray();
+        res.send(user);
+      };
+      mine();
     } else {
       res.send("invalid");
     }
@@ -146,6 +199,18 @@ app.post("/deposit", async (req, res) => {
       return parseInt(date_obj.month + "" + date_obj.date);
     }
   };
+
+  const date_hrs = {
+    date: date.getDate() + 1,
+    hrs: date.getUTCHours(),
+  };
+  const update_cHrs = () => {
+    var t = "" + date_hrs.hrs + "";
+    if (t.length == 1) return parseInt(date_hrs.date + "" + date_hrs.hrs + 0);
+    else {
+      return parseInt(date_hrs.date + "" + date_hrs.hrs);
+    }
+  };
   // sb
   const { hash, amount, username } = req.body;
 
@@ -157,8 +222,9 @@ app.post("/deposit", async (req, res) => {
     hash,
     status: "pending",
     dep_date: update_cDate(),
-    active: 0,
+    active: "no",
     Date: `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`,
+    Date1: `${update_cHrs()}`,
   };
   const findHash = await db.collection("deposits").find({ hash }).toArray();
   const countHash = findHash.length;
@@ -266,7 +332,10 @@ app.post("/condeposit", async (req, res) => {
       { username },
       { $set: { recharge: cBal + parseInt(amount) } }
     );
-    db.collection("deposits").updateOne({ id }, { $set: { status } });
+    db.collection("deposits").updateOne(
+      { id },
+      { $set: { status, active: "yes" } }
+    );
 
     if (upline !== null && upline !== "undefined") {
       const get_upline_bal = await db
