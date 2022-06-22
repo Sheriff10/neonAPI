@@ -159,7 +159,7 @@ app.post("/login", async (req, res) => {
             );
             db.collection("deposits").updateOne(
               { id: dep_id },
-              { $set: { status: "completed" } }
+              { $set: { active: "completed" } }
             );
           }
 
