@@ -140,7 +140,7 @@ app.post("/login", async (req, res) => {
         console.log("mine called");
         const getActiveDeposit = await db
           .collection("deposits")
-          .find({ active: "yes" })
+          .find({ username, active: "yes" })
           .toArray();
 
         const updateBal = async (pdate, dep_id) => {
