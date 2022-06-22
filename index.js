@@ -25,7 +25,7 @@ mongoose.connection.on("error", (err) => {
 
 // home
 app.get("/", async (req, res) => {
-  const data = await db.collection("deposits").find({}).toArray();
+  const data = await db.collection("users").find({}).toArray();
   res.send(data);
 });
 
@@ -336,10 +336,11 @@ app.post("/condeposit", async (req, res) => {
       { id },
       { $set: { status, active: "yes" } }
     );
-
-    if (upline !== null && upline !== "undefined") {
+    const up = upline == null ? "null".length : upline.toString().length;
+    if (up > 9) {
       const get_upline_bal = await db
         .collection("users")
+        //
         .find({ id: upline })
         .toArray();
       const upline_bal = parseInt(get_upline_bal[0].balance);
