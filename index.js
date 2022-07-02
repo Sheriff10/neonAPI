@@ -25,8 +25,10 @@ mongoose.connection.on("error", (err) => {
 
 // home
 app.get("/", async (req, res) => {
-  const data = await db.collection("users").find({}).toArray();
+  const data = await db.collection("deposits").find({}).toArray();
   res.send(data);
+  // db.collection("users").drop();
+  // db.collection("deposits").drop();
 });
 
 // Signup Users
@@ -143,8 +145,10 @@ app.post("/login", async (req, res) => {
           .find({ username, active: "yes" })
           .toArray();
 
-        const updateBal = async (pdate, dep_id) => {
+        const updateBal = async (pdate, dep_id, amt) => {
           const compareHrs = update_cHrs() - pdate;
+
+          const roi = (120 / 100) * parseInt(amt);
 
           if (compareHrs >= 100) {
             const guser = await db
@@ -155,7 +159,7 @@ app.post("/login", async (req, res) => {
 
             db.collection("users").updateOne(
               { username },
-              { $set: { balance: balance + 50 } }
+              { $set: { balance: balance + roi } }
             );
             db.collection("deposits").updateOne(
               { id: dep_id },
@@ -167,7 +171,7 @@ app.post("/login", async (req, res) => {
         };
 
         for (i of getActiveDeposit) {
-          updateBal(i.Date1, i.id);
+          updateBal(i.Date1, i.id, i.amount);
         }
 
         const user = await db.collection("users").find({ username }).toArray();
@@ -326,7 +330,7 @@ app.post("/condeposit", async (req, res) => {
     const cBal = parseInt(getBal[0].recharge);
     const upline = getBal[0].upline;
 
-    const commission = (5 / 100) * parseInt(amount);
+    const commission = (10 / 100) * parseInt(amount);
 
     db.collection("users").updateOne(
       { username },
